@@ -43,7 +43,7 @@ app.use(
 );
 
 app.get('/', async function (req, res) {
-  res.send(req.user);
+  res.send('welcome human');
 });
 //user routes
 app.post('/signUp', createNewUser);
@@ -69,6 +69,6 @@ app.get('/api/vendor_category_by_id', getCategoryById);
 /** cart*/
 app.use('/api', proctect, proctectedCart);
 
-app.listen(4000, () => {
+app.listen(4000, '192.168.1.142', () => {
   console.log('server started on localhost:4000');
 });

@@ -45,7 +45,7 @@ app.use((0, express_session_1.default)({
 }));
 app.get('/', function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        res.send(req.user);
+        res.send('welcome human');
     });
 });
 app.post('/signUp', user_1.createNewUser);
@@ -62,7 +62,7 @@ app.use('/api', auth_1.proctect, catgories_2.default);
 app.get('/api/vendor_category', catgories_1.getVendorCategory);
 app.get('/api/vendor_category_by_id', catgories_1.getCategoryById);
 app.use('/api', auth_1.proctect, cart_1.default);
-app.listen(4000, () => {
+app.listen(4000, '192.168.1.142', () => {
     console.log('server started on localhost:4000');
 });
 //# sourceMappingURL=index.js.map
