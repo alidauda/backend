@@ -16,7 +16,7 @@ const addToCart = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         where: {
             productId: req.body.productId,
             cart: {
-                userId: req.query.userId,
+                userId: req.user.id,
             },
         },
     });

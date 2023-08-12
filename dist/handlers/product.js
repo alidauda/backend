@@ -9,21 +9,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteProductbyId = exports.updateProductbyId = exports.getProductForAVendorbyId = exports.CreateProduct = exports.getProductsByIdForVendor = exports.getProductsById = void 0;
+exports.deleteProductbyId = exports.updateProductbyId = exports.getProductForAVendorbyId = exports.CreateProduct = exports.getProductsById = void 0;
 const db_1 = require("../utils/db");
+const productValidation_1 = require("../utils/productValidation");
 const getProductsById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const product = yield db_1.db.product.findUnique({
-        where: {
-            id: req.params.id,
-        },
-    });
-    res.json({ product });
-});
-exports.getProductsById = getProductsById;
-const getProductsByIdForVendor = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!req.query.id || !req.query.vendorName) {
+        return res
+            .status(400)
+            .json({ message: 'product id or vendor id is required' });
+    }
     const vendor = yield db_1.db.vendor.findUnique({
         where: {
-            id: req.query.vendorId,
+            name: req.query.vendorName,
         },
     });
     if (!vendor) {
@@ -31,14 +28,26 @@ const getProductsByIdForVendor = (req, res) => __awaiter(void 0, void 0, void 0,
     }
     const product = yield db_1.db.product.findUnique({
         where: {
-            id: req.query.productId,
-            vendorId: req.query.vendorId,
+            id: req.query.id,
+            vendor: {
+                name: vendor.name,
+            },
         },
     });
+    if (!product) {
+        return res.status(404).json({ message: 'product not found' });
+    }
     res.json({ product });
 });
-exports.getProductsByIdForVendor = getProductsByIdForVendor;
+exports.getProductsById = getProductsById;
 const CreateProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!req.query.vendorId) {
+        return res.status(400).json({ message: 'vendor id is required' });
+    }
+    if (!req.query.categoriesId) {
+        return res.status(400).json({ message: 'categories id is required' });
+    }
+    (0, productValidation_1.porductValidation)(req, res);
     const vendor = yield db_1.db.vendor.findUnique({
         where: {
             id: req.query.vendorId,
@@ -56,62 +65,121 @@ const CreateProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             product_image: req.body.product_image,
             product_name: req.body.product_name,
             quantity: req.body.quantity,
-            categories: req.body.categories,
+            categories: {
+                connect: {
+                    id: req.query.categoriesId,
+                },
+            },
             vendor: {
                 connect: {
                     id: req.query.vendorId,
                 },
             },
         },
+        include: {
+            categories: true,
+        },
     });
     res.json({ product });
 });
 exports.CreateProduct = CreateProduct;
 const getProductForAVendorbyId = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const product = yield db_1.db.product.findMany({
-        where: {
-            vendorId: req.query.vendorId,
-        },
-    });
-    res.json({ product });
+    if (!req.query.vendorName) {
+        return res.status(400).json({ message: 'vendor name is required' });
+    }
+    try {
+        const vendor = yield db_1.db.vendor.findUnique({
+            where: {
+                name: req.query.vendorName,
+            },
+        });
+        if (!vendor) {
+            return res.status(404).json({ message: 'vendor not found' });
+        }
+        const product = yield db_1.db.product.findMany({
+            where: {
+                vendorId: vendor.id,
+            },
+            include: {
+                categories: true,
+                reviews: true,
+            },
+        });
+        res.json({ product });
+    }
+    catch (_a) {
+        res.status(400).json({ message: 'something went wrong' });
+    }
 });
 exports.getProductForAVendorbyId = getProductForAVendorbyId;
 const updateProductbyId = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const product = yield db_1.db.product.findUnique({
-        where: {
-            id: req.query.productId,
-            vendorId: req.query.vendorId,
-        },
-    });
-    if (!product) {
-        return res.status(404).json({ message: 'product not found' });
+    if (!req.query.vendorId) {
+        return res.status(400).json({ message: 'vendor id is required' });
     }
-    const updatedProduct = yield db_1.db.product.update({
-        where: {
-            id: req.query.productId,
-        },
-        data: req.body,
-    });
-    res.json({ updatedProduct });
+    try {
+        const vendor = yield db_1.db.vendor.findUnique({
+            where: {
+                id: req.query.vendorId,
+            },
+        });
+        if (!vendor) {
+            return res.status(404).json({ message: 'vendor not found' });
+        }
+        const product = yield db_1.db.product.findUnique({
+            where: {
+                id: req.query.productId,
+                vendorId: vendor.id,
+            },
+        });
+        if (!product) {
+            return res.status(404).json({ message: 'product not found' });
+        }
+        const updatedProduct = yield db_1.db.product.update({
+            where: {
+                id: req.query.productId,
+            },
+            data: req.body,
+        });
+        res.json({ updatedProduct });
+    }
+    catch (_b) {
+        res.status(400).json({ message: 'something went wrong' });
+    }
 });
 exports.updateProductbyId = updateProductbyId;
 const deleteProductbyId = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const product = yield db_1.db.product.findUnique({
-        where: {
-            id: req.query.productId,
-            vendorId: req.query.vendorId,
-        },
-    });
-    if (!product) {
-        return res.status(404).json({ message: 'product not found' });
+    try {
+        if (!req.query.vendorId) {
+            return res.status(400).json({ message: 'vendor id is required' });
+        }
+        const vendor = yield db_1.db.vendor.findUnique({
+            where: {
+                id: req.query.vendorId,
+            },
+        });
+        if (!vendor) {
+            return res.status(404).json({ message: 'vendor not found' });
+        }
+        const product = yield db_1.db.product.findUnique({
+            where: {
+                id: req.query.productId,
+                vendorId: vendor.id,
+            },
+        });
+        if (!product) {
+            return res.status(404).json({ message: 'product not found' });
+        }
+        const deleteProduct = yield db_1.db.product.delete({
+            where: {
+                id: req.query.productId,
+                vendorId: vendor.id,
+            },
+        });
+        res.json({ deleteProduct, message: 'nuked succefully' });
     }
-    const deleteProduct = yield db_1.db.product.delete({
-        where: {
-            id: req.query.productId,
-            vendorId: req.query.vendorId,
-        },
-    });
-    res.json({ deleteProduct });
+    catch (_c) {
+        res.status(400).json({ message: 'something went wrong' });
+    }
 });
 exports.deleteProductbyId = deleteProductbyId;
 //# sourceMappingURL=product.js.map

@@ -14,7 +14,7 @@ export const creeateJwt = (user: { id: string; email: string }) => {
     },
 
     process.env.JWT_SECRET_KEY?.toString()!,
-    { expiresIn: 60 * 60 }
+    { expiresIn: 60 * 60 * 45 }
   );
   return token;
 };
@@ -28,6 +28,7 @@ export const proctect = (req: Request, res: Response, next: NextFunction) => {
 
   try {
     const user = jwt.verify(token, process.env.JWT_SECRET_KEY?.toString()!);
+
     req.user = user;
     next();
   } catch (e) {

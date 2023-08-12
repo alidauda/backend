@@ -81,13 +81,34 @@ const getMe = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.getMe = getMe;
 const updateMe = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const user = yield db_1.db.user.update({
-        where: {
-            id: req.user.id,
-        },
-        data: req.body,
-    });
-    res.json({ user });
+    if (req.body.email || req.body.password) {
+        res
+            .status(400)
+            .json({ message: "you can't update your email or password" });
+        return;
+    }
+    try {
+        const user = yield db_1.db.user.findUnique({
+            where: {
+                id: req.user.id,
+            },
+        });
+        if (!user) {
+            res.status(404).json({ message: 'user not found' });
+            return;
+        }
+        const updatedUser = yield db_1.db.user.update({
+            where: {
+                id: req.user.id,
+            },
+            data: req.body,
+        });
+        res.json({ updatedUser });
+    }
+    catch (_a) {
+        res.status(501).json({ message: 'something went wrong please try again ' });
+        return;
+    }
 });
 exports.updateMe = updateMe;
 const forgotPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {

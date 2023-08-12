@@ -11,7 +11,7 @@ const creeateJwt = (user) => {
     const token = jsonwebtoken_1.default.sign({
         id: user.id,
         email: user.email,
-    }, (_a = process.env.JWT_SECRET_KEY) === null || _a === void 0 ? void 0 : _a.toString(), { expiresIn: 60 * 60 });
+    }, (_a = process.env.JWT_SECRET_KEY) === null || _a === void 0 ? void 0 : _a.toString(), { expiresIn: 60 * 60 * 45 });
     return token;
 };
 exports.creeateJwt = creeateJwt;

@@ -7,7 +7,7 @@ export const addToCart = async (req: Request, res: Response) => {
       productId: req.body.productId,
 
       cart: {
-        userId: req.query.userId as string,
+        userId: req.user.id,
       },
     },
   });

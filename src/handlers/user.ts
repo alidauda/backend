@@ -68,14 +68,33 @@ export const getMe = async (req: Request, res: Response) => {
 };
 
 export const updateMe = async (req: Request, res: Response) => {
-  const user = await db.user.update({
-    where: {
-      id: req.user.id,
-    },
-    data: req.body,
-  });
-
-  res.json({ user });
+  if (req.body.email || req.body.password) {
+    res
+      .status(400)
+      .json({ message: "you can't update your email or password" });
+    return;
+  }
+  try {
+    const user = await db.user.findUnique({
+      where: {
+        id: req.user.id,
+      },
+    });
+    if (!user) {
+      res.status(404).json({ message: 'user not found' });
+      return;
+    }
+    const updatedUser = await db.user.update({
+      where: {
+        id: req.user.id,
+      },
+      data: req.body,
+    });
+    res.json({ updatedUser });
+  } catch {
+    res.status(501).json({ message: 'something went wrong please try again ' });
+    return;
+  }
 };
 export const forgotPassword = async (req: Request, res: Response) => {
   try {

@@ -6,9 +6,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const catgories_1 = require("../handlers/catgories");
 const protectedCatgories = express_1.default.Router();
-protectedCatgories.get('/allcategories', catgories_1.getVendorCategory);
-protectedCatgories.post('/create_categories', catgories_1.createCategory);
-protectedCatgories.put('/update_categories', catgories_1.updateCategoryById);
-protectedCatgories.delete('/delete_categories', catgories_1.deleteCategoryById);
+protectedCatgories.get('/vendor/allcategories', catgories_1.getVendorCategory);
+protectedCatgories.get('/vendor/categories', catgories_1.getCategoryById);
+protectedCatgories.post('/vendor/create_categories', catgories_1.createCategory);
+protectedCatgories.put('/vendor/update_categories', catgories_1.updateCategoryById);
+protectedCatgories.delete('/vendor/delete_categories', catgories_1.deleteCategoryById);
 exports.default = protectedCatgories;
 //# sourceMappingURL=catgories.js.map

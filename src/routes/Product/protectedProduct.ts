@@ -3,7 +3,7 @@ import {
   CreateProduct,
   deleteProductbyId,
   getProductForAVendorbyId,
-  getProductsByIdForVendor,
+  getProductsById,
   updateProductbyId,
 } from '../../handlers/product';
 
@@ -12,19 +12,19 @@ import {
 const proctectedProduct = express.Router();
 
 // Get all products
-proctectedProduct.get('/allproducts', getProductForAVendorbyId);
+proctectedProduct.get('/vendor/allproducts', getProductForAVendorbyId);
 // Get all products for a vendor
 
 // Get a product by ID
-proctectedProduct.get('/Product', getProductsByIdForVendor);
+proctectedProduct.get('/vendor/Product', getProductsById);
 
 // Create a new product
-proctectedProduct.post('/products_create', CreateProduct);
+proctectedProduct.post('/vendor/products_create', CreateProduct);
 
 // Update a product
-proctectedProduct.put('/updateProduct', updateProductbyId);
+proctectedProduct.put('/vendor/updateProduct', updateProductbyId);
 
 // Delete a product
-proctectedProduct.delete('/deleteProduct', deleteProductbyId);
+proctectedProduct.delete('/vendor/deleteProduct', deleteProductbyId);
 
 export default proctectedProduct;

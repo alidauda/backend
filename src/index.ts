@@ -12,17 +12,19 @@ import {
   logout,
   resetPassword,
   signIn,
+  updateMe,
 } from './handlers/user';
 import { proctect } from './modules/auth';
 
 import unproctectedProduct from './routes/Product/unProctectedProduct';
 import proctectedVendor from './routes/Vendor/protectedVendor';
-import unproctectedVendor from './routes/Vendor/unprotectedVendor';
 
 import { getCategoryById, getVendorCategory } from './handlers/catgories';
 import protectedCatgories from './routes/catgories';
 import proctectedCart from './routes/cart';
 import proctectedProduct from './routes/Product/protectedProduct';
+
+import unproctectedVendor from './routes/Vendor/unprotectedVendor';
 
 const app = express();
 app.use(bodyParser.json());
@@ -51,24 +53,23 @@ app.post('/login', signIn);
 app.get('/logout', logout);
 app.get('/forgotPassword', forgotPassword);
 app.post('/resetPassword', resetPassword);
-app.get('/api/me', proctect, getMe);
-
-/**product routes */
-app.use('/api', proctect, proctectedProduct);
 app.use('/api', unproctectedProduct);
-
-/**vendor routes */
-app.use('/api', proctect, proctectedVendor);
 app.use('/api', unproctectedVendor);
-
-/**categories route */
-app.use('/api', proctect, protectedCatgories);
 app.get('/api/vendor_category', getVendorCategory);
 app.get('/api/vendor_category_by_id', getCategoryById);
+/**product routes */
+app.use('/api', proctect, proctectedProduct);
+app.use('/api/user_info', proctect, updateMe);
+app.get('/api/me', proctect, getMe);
+app.use('/api', proctect, proctectedVendor);
+app.use('/api', proctect, protectedCatgories);
+app.use('/api', proctect, proctectedCart);
+/**vendor routes */
+
+/**categories route */
 
 /** cart*/
-app.use('/api', proctect, proctectedCart);
 
-app.listen(4000, '192.168.1.142', () => {
+app.listen(4000, () => {
   console.log('server started on localhost:4000');
 });
